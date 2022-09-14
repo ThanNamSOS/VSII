@@ -39,7 +39,6 @@ public class ClaimBenefitServiceImpl implements ClaimBenefitService {
             for (ClaimBenefit ClaimBenefit : benfitModel) {
                 ClaimBenefitEntity benefitEntity = new ClaimBenefitEntity();
                 benefitEntity.setBenefitCode(ClaimBenefit.getBenCode());
-                claimBenefitRepository.save(benefitEntity);
                 LOGGER.info("Save Claim Benefit successful");
                 bencodes.add(benefitEntity.getId());
             }
