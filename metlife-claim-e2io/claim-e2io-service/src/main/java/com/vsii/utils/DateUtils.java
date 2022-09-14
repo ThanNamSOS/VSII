@@ -132,14 +132,17 @@ public class DateUtils {
         calendar.set(Calendar.MILLISECOND, 999);
     }
     public static Timestamp convertDate(String dateInput){
-        try {
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-            Date date = formatter.parse(dateInput);
-            return date == null ? null : new java.sql.Timestamp(date.getTime());
-        }catch (Exception e){
-            LOGGER.info("Erro Date Format: "+dateInput);
-            return null;
+        if (!dateInput.equals("") && dateInput != null) {
+            try {
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+                Date date = formatter.parse(dateInput);
+                return date == null ? null : new java.sql.Timestamp(date.getTime());
+            } catch (Exception e) {
+                LOGGER.info("Erro Date Format: " + dateInput);
+                return null;
+            }
         }
+        return null;
     }
 
     public static Timestamp convertTimestamp(String dateInput){

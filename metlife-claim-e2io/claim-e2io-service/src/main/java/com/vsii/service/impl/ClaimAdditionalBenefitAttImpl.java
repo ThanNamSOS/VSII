@@ -18,15 +18,17 @@ public class ClaimAdditionalBenefitAttImpl implements ClaimAdditionalBenefitAttS
     private ClaimAdditionalBenefitAttRepository benefitAttRepository;
     @Override
     public void Save(JsonObjectFollowup jsonObject, Integer additional) {
+        LOGGER.info("Start save Claim Additional Benefit Att");
         List<Attachments> attachments = jsonObject.getAttachments();
         if(attachments.size() > 0){
             for (Attachments att :attachments) {
-            ClaimAdditionalBenefitAttEntity entity = new ClaimAdditionalBenefitAttEntity();
+                ClaimAdditionalBenefitAttEntity entity = new ClaimAdditionalBenefitAttEntity();
                 entity.setClaimAdditional(additional);
                 entity.setFileName(att.getName());
                 entity.setFileType(att.getContentType());
                 entity.setFollowUpCode(att.getFollowupCode());
                 benefitAttRepository.save(entity);
+                LOGGER.info("Save Claim Additional Benefit Att Successfully");
             }
         }
     }

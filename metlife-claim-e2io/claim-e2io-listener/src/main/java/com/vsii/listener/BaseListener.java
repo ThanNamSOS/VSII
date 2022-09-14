@@ -1,7 +1,9 @@
 package com.vsii.listener;
 
+import com.vsii.config.FilenetConfig;
 import com.vsii.config.PropertiesConfig;
 import com.vsii.repository.FormRepository;
+import com.vsii.repository.IwsCaseHistoryRepository;
 import com.vsii.service.*;
 import com.vsii.service.impl.ClaimAdditionalServiceImpl;
 import com.vsii.service.impl.FileServiceImpl;
@@ -24,6 +26,9 @@ public class BaseListener {
 
     @Autowired
     FileServiceImpl fileService;
+
+    @Autowired
+    FilenetConfig filenetConfig;
 
     @Autowired
     ValidateServiceImpl validateService;
@@ -55,4 +60,7 @@ public class BaseListener {
 
     @Autowired
     ClaimBenefitAttService claimBenefitAttService;
+
+    @Autowired
+    IwsCaseHistoryService iwsCaseHistoryService;
 }

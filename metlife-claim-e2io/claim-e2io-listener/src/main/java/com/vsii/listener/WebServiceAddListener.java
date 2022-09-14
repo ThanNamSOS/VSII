@@ -107,10 +107,12 @@ public class WebServiceAddListener extends BaseListener {
                         for (File file : fileNotFileJson) {
                             fileService.createDocumentAdd(f, file, FilenetUtils.getObjectStore(propertiesConfig), jsonObjectFollowup, claimModel);
                         }
+                        saveDatabase(jsonObjectFollowup,claimModel);
+
                         File fileBackup = new File(fileService.buildFolderPath(webServiceBackup, folder.getName()));
                         fileService.moveFolder(folder, fileBackup);
 // SAVE DATABASE
-                        saveDatabase(jsonObjectFollowup,claimModel);
+
                     } catch (Exception e) {
                         errorDetails.setErrorStackTrace(e.getLocalizedMessage());
                         errorDetails.setErrorRootCause(e.getMessage());

@@ -170,6 +170,10 @@ public class FileServiceImpl implements FileService {
     }
 
     public void updateProperties(EngineObject folder, JsonObject jsonObject, ClaimModel claimModel, String source) throws ParseException {
+
+
+
+
         if (folder.getProperties().find(FileNetConstants.FolderName) != null) {
             folder.getProperties().putValue(FileNetConstants.FolderName, claimModel.getClaimId());
         }
@@ -199,11 +203,8 @@ public class FileServiceImpl implements FileService {
         }
 ///
         if (folder.getProperties().find(FileNetConstants.SubmissionTimestamp) != null) {
-            if(!jsonObject.getSubmissionTimestamp().equals("") && jsonObject.getSubmissionTimestamp() != null ){
-//                OffsetDateTime dateTime = OffsetDateTime.parse(jsonObject.getSubmissionTimestamp());
-//                Instant asInstant = dateTime.toInstant();
-//                Date oldfashionedDate = Date.from(asInstant);
-                Timestamp submissionTimestamp =  DateUtils.convertTimestamp(jsonObject.getSubmissionTimestamp());
+            if (!jsonObject.getSubmissionTimestamp().equals("") && jsonObject.getSubmissionTimestamp() != null) {
+                Timestamp submissionTimestamp = DateUtils.convertTimestamp(jsonObject.getSubmissionTimestamp());
                 folder.getProperties().putValue(FileNetConstants.SubmissionTimestamp, submissionTimestamp);
             }
         }
@@ -235,15 +236,18 @@ public class FileServiceImpl implements FileService {
             for (ClaimBenefit claimBenefit : lifeAssured.getClaimBenefits()) {
                 if (claimBenefit.getClaimId() != null && !Objects.equals(claimBenefit.getClaimId(), "")) {
                     if (folder.getProperties().find(FileNetConstants.BenEndDate) != null) {
-                        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-                        Date date = formatter.parse(claimBenefit.getEndDate());
-                        folder.getProperties().putValue(FileNetConstants.BenEndDate, date);
-
+                        if (!claimBenefit.getEndDate().equals("") && claimBenefit.getEndDate() != null) {
+                            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+                            Date date = formatter.parse(claimBenefit.getEndDate());
+                            folder.getProperties().putValue(FileNetConstants.BenEndDate, date);
+                        }
                     }
                     if (folder.getProperties().find(FileNetConstants.BenStartDate) != null) {
-                        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-                        Date date = formatter.parse(claimBenefit.getStartDate());
-                        folder.getProperties().putValue(FileNetConstants.BenStartDate, date);
+                        if (!claimBenefit.getStartDate().equals("") && claimBenefit.getStartDate() != null) {
+                            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+                            Date date = formatter.parse(claimBenefit.getStartDate());
+                            folder.getProperties().putValue(FileNetConstants.BenStartDate, date);
+                        }
                     }
                 }
             }
@@ -273,9 +277,12 @@ public class FileServiceImpl implements FileService {
         }
 
         if (folder.getProperties().find(FileNetConstants.PayReveiverCidIssueDate) != null) {
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-            Date date = formatter.parse(paymentInfo.getReceiverCidIssueDate());
-            folder.getProperties().putValue(FileNetConstants.PayReveiverCidIssueDate, date);
+            if (!paymentInfo.getReceiverCidIssueDate().equals("") && paymentInfo.getReceiverCidIssueDate() != null) {
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+                Date date = formatter.parse(paymentInfo.getReceiverCidIssueDate());
+                folder.getProperties().putValue(FileNetConstants.PayReveiverCidIssueDate, date);
+            }
+
         }
 
         if (folder.getProperties().find(FileNetConstants.PayReceiveCidIssuePlace) != null) {
@@ -353,7 +360,7 @@ public class FileServiceImpl implements FileService {
             prop.putValue(FileNetConstants.CLAIM_ID, claimModel.getClaimId());
             prop.putValue(FileNetConstants.CLAIM_REQUEST_ID, jsonObject.getClaimRequestId());
             prop.putValue(FileNetConstants.FORM_ID, formId);
-            prop.putValue(FileNetConstants.DOC_TITLE, file.getName().split("_",-1)[0]);
+            prop.putValue(FileNetConstants.DOC_TITLE, file.getName().split("_", -1)[0]);
             Owner owner = jsonObject.getOwner();
             prop.putValue(FileNetConstants.OWNER_NAME, owner.getName());
             prop.putValue(FileNetConstants.OWNER_CITIZEN_ID, owner.getCitizenId());
@@ -395,7 +402,7 @@ public class FileServiceImpl implements FileService {
     }
 
     public Date convertDate(String dateInput) throws ParseException {
-        if(dateInput != "" || dateInput != null){
+        if (!dateInput.equals("") && dateInput != null) {
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
             Date date = formatter.parse(dateInput);
             return date;
@@ -440,7 +447,7 @@ public class FileServiceImpl implements FileService {
             doc.set_MimeType(mimeType);
             doc.checkin(AutoClassify.DO_NOT_AUTO_CLASSIFY, CheckinType.MAJOR_VERSION);
             com.filenet.api.property.Properties prop = doc.getProperties();
-            prop.putValue(FileNetConstants.DOC_TITLE, file.getName().split("_",-1)[0]);
+            prop.putValue(FileNetConstants.DOC_TITLE, file.getName().split("_", -1)[0]);
 
             prop.putValue(FileNetConstants.CLAIM_ID, claimModel.getClaimId());
             prop.putValue(FileNetConstants.CLAIM_REQUEST_ID, jsonObject.getClaimRequestId());
@@ -512,7 +519,7 @@ public class FileServiceImpl implements FileService {
         launched.setParameterValue(FileNetConstants.CLAIM_REQUEST_ID, claimModel.getClaimRequestId(), true);
 
         launched.setParameterValue(FileNetConstants.SOURCE, jsonObject.getSource(), true);
-        if(!jsonObject.getSubmissionTimestamp().equals("") && jsonObject.getSubmissionTimestamp() != null){
+        if (!jsonObject.getSubmissionTimestamp().equals("") && jsonObject.getSubmissionTimestamp() != null) {
             launched.setParameterValue(FileNetConstants.SUBMISSION_TIME, DateUtils.convertTimestamp(jsonObject.getSubmissionTimestamp()), true);
         }
         launched.setParameterValue(FileNetConstants.POLICY_NUMBER, jsonObject.getPolicyNumber(), true);
@@ -530,8 +537,12 @@ public class FileServiceImpl implements FileService {
             launched.setParameterValue(FileNetConstants.LA_CITIZEN_ID, lifeAssured.getCitizenId(), true);
             for (ClaimBenefit claimBenefit : lifeAssured.getClaimBenefits()) {
                 if (claimBenefit.getClaimId() != null && !claimBenefit.getClaimId().equals("")) {
-                    launched.setParameterValue(FileNetConstants.INCUR_DATE, convertDate(claimBenefit.getStartDate()), true);
-                    launched.setParameterValue(FileNetConstants.DISCHAR_DATE, convertDate(claimBenefit.getEndDate()), true);
+                    if (!claimBenefit.getStartDate().equals("") && claimBenefit.getStartDate() != null) {
+                        launched.setParameterValue(FileNetConstants.INCUR_DATE, convertDate(claimBenefit.getStartDate()), true);
+                    }
+                    if (!claimBenefit.getEndDate().equals("") && claimBenefit.getEndDate() != null) {
+                        launched.setParameterValue(FileNetConstants.DISCHAR_DATE, convertDate(claimBenefit.getEndDate()), true);
+                    }
                 }
                 launched.setParameterValue(FileNetConstants.BEN_CODE, claimBenefit.getBenCode(), true);
             }

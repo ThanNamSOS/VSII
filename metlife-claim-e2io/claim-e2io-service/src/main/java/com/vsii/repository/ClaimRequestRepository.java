@@ -6,4 +6,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ClaimRequestRepository extends JpaRepository<ClaimRequestEntity, Integer> {
+
+
+
 }

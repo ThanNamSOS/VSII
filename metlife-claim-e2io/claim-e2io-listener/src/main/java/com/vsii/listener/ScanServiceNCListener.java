@@ -2,10 +2,8 @@ package com.vsii.listener;
 
 import com.filenet.api.core.Folder;
 import com.google.gson.Gson;
-import com.vsii.entity.ClaimAdditionalBenefitEntity;
-import com.vsii.entity.ClaimAdditionalEntity;
-import com.vsii.entity.ClaimRequestEntity;
-import com.vsii.entity.Form;
+import com.vsii.entity.*;
+import com.vsii.enums.SourceEnum;
 import com.vsii.model.*;
 import com.vsii.utils.DateUtils;
 import com.vsii.utils.FilenetUtils;
@@ -20,6 +18,7 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -88,6 +87,7 @@ public class ScanServiceNCListener extends BaseListener {
             Gson gson = new Gson();
             JsonObject jsonObject = gson.fromJson(json, JsonObject.class);
             Folder f = fileService.findByAppNo(FilenetUtils.getObjectStore(propertiesConfig), claimModel.getClaimId());
+            Boolean checkInsertHistory = false;
             if (f == null) {
                 try {
                     Folder folCreate = fileService.createFolder(FilenetUtils.getObjectStore(propertiesConfig), jsonObject, claimModel, source, propertiesConfig.getPathSaveFolder());
@@ -99,6 +99,7 @@ public class ScanServiceNCListener extends BaseListener {
                     fileService.moveFolder(folder, fileBackup);
 // Save database
                     saveDatabase(jsonObject, claimModel);
+                    checkInsertHistory = true;
                 } catch (Exception e) {
                     errorDetails.setErrorStackTrace(e.getLocalizedMessage());
                     errorDetails.setErrorRootCause(e.getMessage());
@@ -129,6 +130,39 @@ public class ScanServiceNCListener extends BaseListener {
                     fileService.moveFolder(folder, fileError);
                     fileService.buildErrorFile(fileService.buildFolderPath(scanError, folder.getName()), errorModel);
                 }
+            }
+
+            if (checkInsertHistory) {
+                List<IwsCaseHistoryEntity> lst = new ArrayList<>();
+                IwsCaseHistoryEntity entity = new IwsCaseHistoryEntity();
+                Date currentDate = new Date();
+                Timestamp timestamp = new Timestamp(currentDate.getTime());
+                entity.setAppNo(claimModel.getClaimId());
+                entity.setCaseStatus("Completed Normal");
+                entity.setResponse("New Claim");
+                entity.setCreatedDate(timestamp);
+                entity.setCompletedTime(timestamp);
+                entity.setReceivedTime(timestamp);
+                entity.setSubmissionDate(timestamp);
+                entity.setUserId(filenetConfig.getWfUserName());
+                lst.add(entity);
+                IwsCaseHistoryEntity saleEntity = new IwsCaseHistoryEntity();
+                Timestamp submissionDate = DateUtils.convertTimestamp(jsonObject.getSubmissionTimestamp());
+                saleEntity.setAppNo(claimModel.getClaimId());
+                saleEntity.setCaseStatus("Completed Normal");
+                saleEntity.setCreatedDate(timestamp);
+                saleEntity.setCompletedTime(submissionDate);
+                saleEntity.setReceivedTime(submissionDate);
+                saleEntity.setSubmissionDate(submissionDate);
+                if (source.equals(SourceEnum.Manual.toString())) {
+                    saleEntity.setResponse("Scan Submitted");
+                    saleEntity.setUserId("Scan");
+                } else {
+                    saleEntity.setResponse("Sales Submmited");
+                    saleEntity.setUserId("Sales");
+                }
+                lst.add(saleEntity);
+                iwsCaseHistoryService.save(lst);
             }
         }
     }

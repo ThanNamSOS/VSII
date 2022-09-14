@@ -155,6 +155,8 @@ public class FileNetConstants {
     public static final String FOLLOWUP = "FollowUp";
     public static final String PENDING_QUEUE = "PendingQueue";
 
+    public static final String TIMESTAMP_DATE_FORMAT = "yyyyMMddHHmmss";
+
 
 
 }

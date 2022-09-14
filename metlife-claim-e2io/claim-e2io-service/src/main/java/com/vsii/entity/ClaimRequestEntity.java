@@ -13,78 +13,78 @@ public class ClaimRequestEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
-    private Integer id;
+    private int id;
 
     @Column(name = "SOURCE")
-    private String Source;
+    private String source;
 
     @Column(name = "OWNERCLIENTID")
-    private String OwnerClientId;
+    private String ownerClientId;
 
     @Column(name = "OWNERNAME")
-    private String OwnerName;
+    private String ownerName;
 
     @Column(name = "POLICYNO")
-    private String PolicyNo;
+    private String policyNo;
 
     @Column(name = "SUBMISSIONTIMESTAMP")
-    private Timestamp SubmissionTimestamp;
+    private Timestamp submissionTimestamp;
 
     @Column(name = "OWNERCLIENTNUMBER")
-    private String OwnerClientNumber;
+    private String ownerClientNumber;
 
     @Column(name = "OWNERCITIZENID")
-    private String OwnerCitizenId;
+    private String ownerCitizenId;
 
     @Column(name = "LACLIENTID")
-    private String LaClientId;
+    private String laClientId;
 
     @Column(name = "LACLIENTNUMBER")
-    private String LaClientNumber;
+    private String laClientNumber;
 
     @Column(name = "LALIFENO")
-    private String LaLifeNo;
+    private String laLifeNo;
 
     @Column(name = "LANAME")
-    private String LaName;
+    private String laName;
 
     @Column(name = "LACITIZENID")
-    private String LaCitizenId;
+    private String laCitizenId;
 
     @Column(name = "PAYMODE")
-    private String PayMode;
+    private String payMode;
 
     @Column(name = "PAYPOLICYNUMBER")
-    private String PayPolicyNumber;
+    private String payPolicyNumber;
 
     @Column(name = "PAYACCOWNERNAME")
-    private String PayAccOwnerName;
+    private String payAccOwnerName;
 
     @Column(name = "PAYBANK")
-    private String PayBank;
+    private String payBank;
 
     @Column(name = "PAYRECEIVERNAME")
-    private String PayReceiverName;
+    private String payReceiverName;
 
     @Column(name = "PAYACCNUMBER")
-    private String PayAccNumber;
+    private String payAccNumber;
 
     @Column(name = "PAYRECEIVERCITYZENID")
-    private String PayReceiverCityzenId;
+    private String payReceiverCityzenId;
 
     @Column(name = "PAYREVEIVERCIDISSUEDATE")
-    private Timestamp PayReveiverCidIssueDate;
+    private Timestamp payReveiverCidIssueDate;
 
     @Column(name = "PAYRECEIVECIDISSUEPLACE")
-    private String PAYRECEIVECIDISSUEPLACE;
+    private String  payReceiverCidIssuePlace;
 
     @Column(name = "PAYRECEIVEBANK")
-    private String PayReceiveBank;
+    private String payReceiveBank;
 
     @Column(name = "FATCACODE")
-    private String FatcaCode;
+    private String fatcaCode;
 
     @Column(name = "FATCADESCRIPTION")
-    private String FatcaDescription;
+    private String fatcaDescription;
 
 }

@@ -26,6 +26,7 @@ public class ClaimAdditionalBenefitServiceImpl implements ClaimAdditionalBenefit
             ClaimAdditionalBenefitEntity additionalBenefit = new ClaimAdditionalBenefitEntity();
             additionalBenefit.setIdClaimAdditional(idAdditional);
             additinalBenefitRepository.save(additionalBenefit);
+            LOGGER.info(" Save Claim Additinal Benefit Successfuly");
             idAddBens.add(additionalBenefit.getId());
         }
         return idAddBens;

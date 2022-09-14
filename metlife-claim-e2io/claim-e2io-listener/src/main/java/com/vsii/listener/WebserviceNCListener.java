@@ -2,6 +2,7 @@ package com.vsii.listener;
 
 import com.filenet.api.core.Folder;
 import com.google.gson.Gson;
+import com.vsii.constants.FileNetConstants;
 import com.vsii.entity.*;
 import com.vsii.enums.ErrorEnum;
 import com.vsii.enums.SourceEnum;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -91,17 +93,21 @@ public class WebserviceNCListener extends BaseListener {
             Gson gson = new Gson();
             JsonObject jsonObject = gson.fromJson(json, JsonObject.class);
             Folder f = fileService.findByAppNo(FilenetUtils.getObjectStore(propertiesConfig), claimModel.getClaimId());
+            boolean checkInsertHistory = false;
             if (f == null) {
                 try {
                     Folder folCreate = fileService.createFolder(FilenetUtils.getObjectStore(propertiesConfig), jsonObject, claimModel, jsonObject.getSource(), propertiesConfig.getPathSaveFolder());
                     for (File file : fileNotFileJson) {
                         fileService.createDocument(folCreate, file, FilenetUtils.getObjectStore(propertiesConfig), jsonObject, claimModel);
                     }
-                    fileService.createWorkFlow(folCreate, vwSession, claimModel, jsonObject);
-                    File fileBackup = new File(fileService.buildFolderPath(webServiceBackup, folder.getName()));
-                    fileService.moveFolder(folder, fileBackup);
 //Save databas
                     saveDatabase(jsonObject, claimModel);
+                    fileService.createWorkFlow(folCreate, vwSession, claimModel, jsonObject);
+                    checkInsertHistory = true;
+                    File fileBackup = new File(fileService.buildFolderPath(webServiceBackup, folder.getName()));
+                    fileService.moveFolder(folder, fileBackup);
+
+
                 } catch (Exception e) {
                     errorDetails.setErrorStackTrace(e.getLocalizedMessage());
                     errorDetails.setErrorRootCause(e.getMessage());
@@ -132,20 +138,54 @@ public class WebserviceNCListener extends BaseListener {
                     fileService.buildErrorFile(fileService.buildFolderPath(webServiceError, folder.getName()), errorModel);
                 }
             }
+
+            if (checkInsertHistory) {
+                List<IwsCaseHistoryEntity> lst = new ArrayList<>();
+                IwsCaseHistoryEntity entity = new IwsCaseHistoryEntity();
+                Date currentDate = new Date();
+                Timestamp timestamp = new Timestamp(currentDate.getTime());
+                entity.setAppNo(claimModel.getClaimId());
+                entity.setCaseStatus("Completed Normal");
+                entity.setResponse("New Claim");
+                entity.setCreatedDate(timestamp);
+                entity.setCompletedTime(timestamp);
+                entity.setReceivedTime(timestamp);
+                entity.setSubmissionDate(timestamp);
+                entity.setUserId(filenetConfig.getWfUserName());
+                lst.add(entity);
+                IwsCaseHistoryEntity saleEntity = new IwsCaseHistoryEntity();
+                Timestamp submissionDate = DateUtils.convertTimestamp(jsonObject.getSubmissionTimestamp());
+                saleEntity.setAppNo(claimModel.getClaimId());
+                saleEntity.setCaseStatus("Completed Normal");
+                saleEntity.setCreatedDate(timestamp);
+                saleEntity.setCompletedTime(submissionDate);
+                saleEntity.setReceivedTime(submissionDate);
+                saleEntity.setSubmissionDate(submissionDate);
+                if (jsonObject.getSource().equals(SourceEnum.Manual.toString())) {
+                    saleEntity.setResponse("Scan Submitted");
+                    saleEntity.setUserId("Scan");
+                } else {
+                    saleEntity.setResponse("Sales Submmited");
+                    saleEntity.setUserId("Sales");
+                }
+                lst.add(saleEntity);
+                iwsCaseHistoryService.save(lst);
+            }
+
+
         }
     }
 
     private void saveDatabase(JsonObject jsonObject, ClaimModel claimModel) {
         try {
             LOGGER.info("Start Save  database Web service NC ");
-            Integer claimRequestEntity = null;
-            claimRequestService.save(jsonObject);
+            ClaimRequestEntity claimRequestEntity = claimRequestService.save(jsonObject);;
             if (claimRequestEntity != null) {
-                claimBenefitInfoService.Save(jsonObject, claimRequestEntity);
-                claimCaseService.Save(jsonObject, claimRequestEntity, claimModel);
+                claimBenefitInfoService.Save(jsonObject, claimRequestEntity.getId());
+                claimCaseService.Save(jsonObject, claimRequestEntity.getId(), claimModel);
             }
             List<Integer> idClaimBenefit = claimBenefitService.Save(jsonObject);
-            if(idClaimBenefit != null){
+            if(idClaimBenefit.size()>0){
                 for (Integer id : idClaimBenefit) {
                     claimBenefitAttService.Save(jsonObject,id);
                 }
