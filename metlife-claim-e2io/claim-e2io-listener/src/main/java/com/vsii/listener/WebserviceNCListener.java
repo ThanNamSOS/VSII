@@ -7,6 +7,7 @@ import com.vsii.entity.*;
 import com.vsii.enums.ErrorEnum;
 import com.vsii.enums.SourceEnum;
 import com.vsii.model.*;
+import com.vsii.service.ClaimBenefitInfoService;
 import com.vsii.service.ClaimRequestService;
 import com.vsii.utils.DateUtils;
 import com.vsii.utils.FilenetUtils;
@@ -186,12 +187,6 @@ public class WebserviceNCListener extends BaseListener {
             if (claimRequestEntity != null) {
                 claimBenefitInfoService.Save(jsonObject, claimRequestEntity.getId());
                 claimCaseService.Save(jsonObject, claimRequestEntity.getId(), claimModel);
-            }
-            List<Integer> idClaimBenefit = claimBenefitService.Save(jsonObject);
-            if (idClaimBenefit.size() > 0) {
-                for (Integer id : idClaimBenefit) {
-                    claimBenefitAttService.Save(jsonObject, id);
-                }
             }
         } catch (Exception e) {
             LOGGER.info("Save database Web service NC false: ");
