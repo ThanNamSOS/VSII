@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.FileReader;
@@ -43,7 +44,7 @@ public class WebserviceNCListener extends BaseListener {
         String webServiceError = fileService.buildFolderPath(propertiesConfig.getFolderError(), propertiesConfig.getFolderWebserviceNC());
         File folder = new File(message);
         File[] files = folder.listFiles();
-        Map<String, Form> mapForm = formRepository.findByFormActive("Y").stream().collect(Collectors.toMap(Form::getFormId, form -> form));
+        Map<String, Form> mapForm = formRepository.findByFormActiveAndFormClassname("Y", "ClaimDocument").stream().collect(Collectors.toMap(Form::getFormId, form -> form));
         List<ErrorDetails> lstError = new ArrayList<>();
         String[] lstExtensions = propertiesConfig.getFileExtensions();
         String fileDelimiter = propertiesConfig.getFileDelimiter();
@@ -176,21 +177,23 @@ public class WebserviceNCListener extends BaseListener {
         }
     }
 
-    private void saveDatabase(JsonObject jsonObject, ClaimModel claimModel) {
+    @Transactional
+    public void saveDatabase(JsonObject jsonObject, ClaimModel claimModel) {
         try {
             LOGGER.info("Start Save  database Web service NC ");
-            ClaimRequestEntity claimRequestEntity = claimRequestService.save(jsonObject);;
+            ClaimRequestEntity claimRequestEntity = claimRequestService.save(jsonObject);
+            ;
             if (claimRequestEntity != null) {
                 claimBenefitInfoService.Save(jsonObject, claimRequestEntity.getId());
                 claimCaseService.Save(jsonObject, claimRequestEntity.getId(), claimModel);
             }
             List<Integer> idClaimBenefit = claimBenefitService.Save(jsonObject);
-            if(idClaimBenefit.size()>0){
+            if (idClaimBenefit.size() > 0) {
                 for (Integer id : idClaimBenefit) {
-                    claimBenefitAttService.Save(jsonObject,id);
+                    claimBenefitAttService.Save(jsonObject, id);
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             LOGGER.info("Save database Web service NC false: ");
             e.printStackTrace();
         }

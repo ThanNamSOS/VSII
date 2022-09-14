@@ -172,8 +172,6 @@ public class FileServiceImpl implements FileService {
     public void updateProperties(EngineObject folder, JsonObject jsonObject, ClaimModel claimModel, String source) throws ParseException {
 
 
-
-
         if (folder.getProperties().find(FileNetConstants.FolderName) != null) {
             folder.getProperties().putValue(FileNetConstants.FolderName, claimModel.getClaimId());
         }
@@ -322,6 +320,7 @@ public class FileServiceImpl implements FileService {
     public void createDocument(Folder folder, File file, ObjectStore os, JsonObject jsonObject, ClaimModel claimModel) throws Exception {
         try {
             String formId = file.getName().split("_", -1)[0];
+            Form form = formRepository.findFormByFormIdAndFormActiveAndFormClassname(formId, "Y", "ClaimDocument");
             InputStream inputStream = null;
             Exception fileEx = null;
             for (int i = 0; i < 5; i++) {
@@ -359,7 +358,7 @@ public class FileServiceImpl implements FileService {
 
             prop.putValue(FileNetConstants.CLAIM_ID, claimModel.getClaimId());
             prop.putValue(FileNetConstants.CLAIM_REQUEST_ID, jsonObject.getClaimRequestId());
-            prop.putValue(FileNetConstants.FORM_ID, formId);
+            prop.putValue(FileNetConstants.FORM_ID, form.getFormName());
             prop.putValue(FileNetConstants.DOC_TITLE, file.getName().split("_", -1)[0]);
             Owner owner = jsonObject.getOwner();
             prop.putValue(FileNetConstants.OWNER_NAME, owner.getName());

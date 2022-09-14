@@ -50,7 +50,7 @@ public class WebServiceAddListener extends BaseListener {
 //            }
 //        }
         File[] files = folder.listFiles();
-        Map<String, Form> mapForm = formRepository.findByFormActive("Y").stream().collect(Collectors.toMap(Form::getFormId, form -> form));
+        Map<String, Form> mapForm = formRepository.findByFormActiveAndFormClassname("Y","ClaimDocument").stream().collect(Collectors.toMap(Form::getFormId, form -> form));
 
         String[] lstExtensions = propertiesConfig.getFileExtensions();
         String fileDelimiter = propertiesConfig.getFileDelimiter();

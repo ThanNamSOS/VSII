@@ -4,6 +4,7 @@ import com.vsii.entity.ClaimAdditionalEntity;
 import com.vsii.entity.ClaimRequestEntity;
 import com.vsii.entity.IwsCaseHistoryEntity;
 import com.vsii.enums.SourceEnum;
+import com.vsii.model.ClaimModel;
 import com.vsii.model.JsonObject;
 import com.vsii.model.JsonObjectFollowup;
 import com.vsii.service.*;
@@ -48,17 +49,22 @@ public class maintestApi {
     public void save(@RequestBody JsonObject jsonObject) {
         claimRequestService.save(jsonObject);
         ClaimRequestEntity claimRequestEntity = claimRequestService.save(jsonObject);
-        ;
+        ClaimModel claimModel = new ClaimModel();
+        String claimRequestId = "O00008360";
+        claimModel.setClaimRequestId(claimRequestId);
+        claimModel.setClaimId(claimRequestId);
+        claimModel.setSource("PPX");
+        claimModel.setBenCode("BEN01");
         if (claimRequestEntity != null) {
-            claimBenefitInfoService.Save(jsonObject, claimRequestEntity.getId());
-            claimCaseService.Save(jsonObject, claimRequestEntity.getId(), null);
+           // claimBenefitInfoService.Save(jsonObject, claimRequestEntity.getId());
+            claimCaseService.Save(jsonObject, 11111, claimModel);
         }
-        List<Integer> idClaimBenefit = claimBenefitService.Save(jsonObject);
-        if (idClaimBenefit != null) {
-            for (Integer id : idClaimBenefit) {
-                claimBenefitAttService.Save(jsonObject, id);
-            }
-        }
+//        List<Integer> idClaimBenefit = claimBenefitService.Save(jsonObject);
+//        if (idClaimBenefit != null) {
+//            for (Integer id : idClaimBenefit) {
+//                claimBenefitAttService.Save(jsonObject, id);
+//            }
+//        }
     }
 
     @PostMapping("demoAdd")

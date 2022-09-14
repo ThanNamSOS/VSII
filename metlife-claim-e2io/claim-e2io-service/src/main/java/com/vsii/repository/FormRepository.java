@@ -8,7 +8,7 @@ import java.util.List;
 
 @Repository
 public interface FormRepository extends JpaRepository<Form, String> {
-    List<Form> findByFormId(String formId);
+    Form findFormByFormIdAndFormActiveAndFormClassname(String formId, String formActive, String formClass);
 
-    List<Form> findByFormActive(String formActive);
+    List<Form> findByFormActiveAndFormClassname(String formActive, String formClass);
 }

@@ -37,7 +37,7 @@ public class ScanServiceNCListener extends BaseListener {
         String scanError = fileService.buildFolderPath(propertiesConfig.getFolderError(), propertiesConfig.getFolderScanNCPPX());
         File folder = new File(message);
         File[] files = folder.listFiles();
-        Map<String, Form> mapForm = formRepository.findByFormActive("Y").stream().collect(Collectors.toMap(Form::getFormId, form -> form));
+        Map<String, Form> mapForm = formRepository.findByFormActiveAndFormClassname("Y","ClaimDocument").stream().collect(Collectors.toMap(Form::getFormId, form -> form));
         List<ErrorDetails> lstError = new ArrayList<>();
         String[] lstExtensions = propertiesConfig.getFileExtensions();
         String fileDelimiter = propertiesConfig.getFileDelimiter();
